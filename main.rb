@@ -5,7 +5,7 @@ class MasterMind
   # initial colors => 'red', 'green', 'yellow', 'blue', 'magenta', 'black'
   @@color_array = %w[red green yellow blue magenta black]
   # store code
-  @@code = ['red', 'green', 'yellow', 'blue'] # values added for temporary purposes 
+  @@code = %w[red green blue black]
   # end game on turn exceeding maximum 12
   # ask user to be creator of code or guesser
   def ask
@@ -24,11 +24,11 @@ class MasterMind
       # display chosen choice
       puts "\r"
       if @input.downcase == 'mm'
-        puts "You'll be playing as MasterMind"
+        puts "You've chosen :- "
         @flag = true
         @choice = 'mastermind'
       elsif @input.downcase == 'cb'
-        puts "You' be playing as CodeBreaker"
+        puts "You've chosen :-"
         @flag = true
         @choice = 'codebreaker'
       else
@@ -37,7 +37,8 @@ class MasterMind
         @flag = false
       end
     end
-    p @choice
+    # return player choice
+    @choice
   end
 
   # get random color code for the computer
@@ -54,40 +55,68 @@ class MasterMind
   end
 
   # get guess from Human/Computer
-  def get_guess; end
+  def get_guess(player)
+    @flag = false
+    @turns = 1
+    puts "Make sure the spellings are correct!"
+    # run loop til all matches are '🟢' or turns are finished
+    while !@flag || @turns < 13
+      # get guess from Player
+      print "Enter your guess #{player} : "
+      @guess = gets.chomp 
+      @guess = @guess.split
+      # call feedback method
+      @answer = self.feedback_message(@guess)
+      # check if all answers are '🟢' or not
+      if @answer.all? { |answer| answer == '🟢' }
+        # show user feedback
+        print "Feedback Message : "
+        puts @answer.join
+        @flag = true
+        puts "Game Over"
+        break
+      else
+        # show user feedback
+        print "Feedback Message : "
+        puts @answer.join
+        puts "Wrong guess! Keep trying."
+      end
+      @turns += 1
+    end
+  end
 
   # return feedback message
   def feedback_message(guess)
     @feedback = []
-    # '⭕' => correct color at correct position
-    # '❌' => correct color at wrong position
-    # ' ' => color not used in code
+    # '🟢' => correct color at correct position
+    # '⭕' => correct color at wrong position
+    # '⚫' => color not used in code
     @guess_array = guess
-    # store matches 
-    @matched = []    
+    # store matches
+    @matched = []
     # iterate through the array and check for matches
     # if an element matches then check for indexes as well
-    @guess_array.each_with_index do |guess, guess_index|
-      # push element that matches with any code element 
-      if @@code.include?(guess) == true
-        @matched << guess
-      else
-        # if not, then push '_' to the feedback
-        @matched << '_'
-      end
+    @guess_array.each_with_index do |guess, _guess_index|
+      # push element that matches with any code element
+      @matched << if @@code.include?(guess) == true
+                    guess
+                  else
+                    # if not, then push '_' to the feedback
+                    '_'
+                  end
     end
-    # now check if matches were 
-    if !@matched.all? { |colors| colors == '_' }
+    # now check if matches were
+    unless @matched.all? { |colors| colors == '_' }
       4.times do |i|
-        if @matched[i] == @@code[i]
-          # if element matches with code's element
-          @feedback << '⭕'
-        elsif @matched[i] == '_'
-          # if element matches with '_'
-          @feedback << ' '
-        else
-          @feedback << '❌'
-        end
+        @feedback << if @matched[i] == @@code[i]
+                       # if element matches with code's element
+                       '🟢'
+                     elsif @matched[i] == '_'
+                       # if element matches with '_'
+                       '⚫'
+                     else
+                       '⭕'
+                     end
       end
     end
     # return the feedback
@@ -96,5 +125,4 @@ class MasterMind
 end
 
 game = MasterMind.new
-# given in code : ['red', 'green', 'yellow', 'blue']
-puts game.feedback_message(['red', 'white', 'green', 'blue'])
+p game.get_guess("Mastermind")
