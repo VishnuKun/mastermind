@@ -1,6 +1,9 @@
-module MyMethods
+# frozen_string_literal: true
 
-    # end game on turn exceeding maximum 12
+require_relative './main.rb'
+
+module MyMethods
+  # end game on turn exceeding maximum 12
   # ask user to be creator of code or guesser
   def ask
     # flag for ending loop
@@ -34,6 +37,7 @@ module MyMethods
     # return player choice
     @choice
   end
+
   # get random color code for the computer
   def code_generator
     @code = []
@@ -58,19 +62,23 @@ module MyMethods
       print "Enter your guess #{player} : "
       @guess = gets.chomp
       @guess = @guess.split
-      # call feedback method
-      @answer = feedback_message(@guess)
-      # check if all answers are '🟢' or not
-      print 'Feedback Message : '
-      puts @answer.join
-      if @answer.all? { |answer| answer == '🟢' }
-        # show user feedback
-        @flag = true
-        puts 'Game Over'
-        break
+      # input should only be 4 characters long
+      if @guess.length != 4
+        puts "\r"
+        puts 'Please enter 4 colors only! Please try again.'
       else
-        # show user feedback
-        puts 'Wrong guess! Keep trying.'
+        # call feedback method
+        @answer = feedback_message(@guess)
+        # check if all answers are '🟢' or not
+        print 'Feedback Message : '
+        puts @answer.join
+        if @answer.all? { |answer| answer == '🟢' }
+          # show user feedback
+          @flag = true
+        else
+          # show user feedback
+          puts 'Wrong guess! Keep trying.'
+        end
       end
       @turns += 1
     end
