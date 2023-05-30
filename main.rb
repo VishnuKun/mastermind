@@ -61,7 +61,7 @@ class MasterMind
     @feedback = []
     # '⭕' => correct color at correct position
     # '❌' => correct color at wrong position
-    # '_' => color not used in code
+    # ' ' => color not used in code
     @guess_array = guess
     # store matches 
     @matched = []    
@@ -84,17 +84,17 @@ class MasterMind
           @feedback << '⭕'
         elsif @matched[i] == '_'
           # if element matches with '_'
-          @feedback << '_'
+          @feedback << ' '
         else
           @feedback << '❌'
         end
       end
     end
     # return the feedback
-    @feedback.sort
+    @feedback.shuffle
   end
 end
 
-x = MasterMind.new
+game = MasterMind.new
 # given in code : ['red', 'green', 'yellow', 'blue']
-puts x.feedback_message(['red', 'white', 'green', 'blue'])
+puts game.feedback_message(['red', 'white', 'green', 'blue'])
