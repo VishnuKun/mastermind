@@ -1,128 +1,55 @@
 # frozen_string_literal: true
 
+require_relative '/module.rb'
+require_relative '/players.rb'
 class MasterMind
-  def guess; end
   # initial colors => 'red', 'green', 'yellow', 'blue', 'magenta', 'black'
   @@color_array = %w[red green yellow blue magenta black]
   # store code
-  @@code = %w[red green blue black]
-  # end game on turn exceeding maximum 12
-  # ask user to be creator of code or guesser
-  def ask
-    # flag for ending loop
-    @flag = false
-    # store user choice
-    @choice = nil
-    # keep asking until user gives correct answer
-    while @flag == false
-      # display statements
-      puts "\r"
-      puts 'Would you like to play as Master Mind or Code Breaker?'
-      print 'Type MM to play as Master Mind or type CB to play as Code Breaker : '
-      # get user input
-      @input = gets.chomp
-      # display chosen choice
-      puts "\r"
-      if @input.downcase == 'mm'
-        puts "You've chosen :- "
-        @flag = true
-        @choice = 'mastermind'
-      elsif @input.downcase == 'cb'
-        puts "You've chosen :-"
-        @flag = true
-        @choice = 'codebreaker'
-      else
-        puts "\r"
-        puts 'Invalid choice, please try again.'
-        @flag = false
-      end
-    end
-    # return player choice
-    @choice
-  end
+  @@code = []
+  # mix in
+  include MyMethods
+  
+  # set color code as per user's choice
 
-  # get random color code for the computer
-  def code_generator
-    @code = []
-    # push 4 random colors into the code
-    # from the colors array
-    4.times do
-      # push 1 random color into the code
-      # remove it from the color array as well
-      @code << @@color_array.delete_at(rand(@@color_array.size - 1))
-    end
-    @code
-  end
-
-  # get guess from Human/Computer
-  def get_guess(player)
-    @flag = false
-    @turns = 1
-    puts "Make sure the spellings are correct!"
-    # run loop til all matches are '🟢' or turns are finished
-    while !@flag || @turns < 13
-      # get guess from Player
-      print "Enter your guess #{player} : "
-      @guess = gets.chomp 
-      @guess = @guess.split
-      # call feedback method
-      @answer = self.feedback_message(@guess)
-      # check if all answers are '🟢' or not
-      if @answer.all? { |answer| answer == '🟢' }
-        # show user feedback
-        print "Feedback Message : "
-        puts @answer.join
-        @flag = true
-        puts "Game Over"
-        break
-      else
-        # show user feedback
-        print "Feedback Message : "
-        puts @answer.join
-        puts "Wrong guess! Keep trying."
+    # return feedback message
+    def feedback_message(guess)
+      @feedback = []
+      # '🟢' => correct color at correct position
+      # '⭕' => correct color at wrong position
+      # '⚫' => color not used in code
+      @guess_array = guess
+      # store matches
+      @matched = []
+      # iterate through the array and check for matches
+      # if an element matches then check for indexes as well
+      @guess_array.each_with_index do |guess, _guess_index|
+        # push element that matches with any code element
+        @matched << if @@code.include?(guess) == true
+                      guess
+                    else
+                      # if not, then push '_' to the feedback
+                      '_'
+                    end
       end
-      @turns += 1
-    end
-  end
-
-  # return feedback message
-  def feedback_message(guess)
-    @feedback = []
-    # '🟢' => correct color at correct position
-    # '⭕' => correct color at wrong position
-    # '⚫' => color not used in code
-    @guess_array = guess
-    # store matches
-    @matched = []
-    # iterate through the array and check for matches
-    # if an element matches then check for indexes as well
-    @guess_array.each_with_index do |guess, _guess_index|
-      # push element that matches with any code element
-      @matched << if @@code.include?(guess) == true
-                    guess
-                  else
-                    # if not, then push '_' to the feedback
-                    '_'
-                  end
-    end
-    # now check if matches were
-    unless @matched.all? { |colors| colors == '_' }
-      4.times do |i|
-        @feedback << if @matched[i] == @@code[i]
-                       # if element matches with code's element
-                       '🟢'
-                     elsif @matched[i] == '_'
-                       # if element matches with '_'
-                       '⚫'
-                     else
-                       '⭕'
-                     end
+      # now check if matches were
+      unless @matched.all? { |colors| colors == '_' }
+        4.times do |i|
+          @feedback << if @matched[i] == @@code[i]
+                         # if element matches with code's element
+                         '🟢'
+                       elsif @matched[i] == '_'
+                         # if element matches with '_'
+                         '⚫'
+                       else
+                         '⭕'
+                       end
+        end
       end
+      # return the feedback
+      @feedback.shuffle
     end
-    # return the feedback
-    @feedback.shuffle
-  end
 end
 
 game = MasterMind.new
-p game.get_guess("Mastermind")
+p game.get_guess('Mastermind')
