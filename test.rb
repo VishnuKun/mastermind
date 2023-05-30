@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require 'rspec/autorun'
-require_relative './main'
+require_relative '/main'
+require_relative '/module.rb'
 
 describe MasterMind do
   let(:game) { MasterMind.new }
