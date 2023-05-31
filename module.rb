@@ -1,8 +1,25 @@
 # frozen_string_literal: true
 
-require_relative './main.rb'
-
 module MyMethods
+  # ask the mastermind to set the code for game
+  def set_code 
+    @code = nil
+    while true
+      # get the code
+      puts "\r"
+      print 'Set the code for game, MasterMind : '
+      @input = gets.chomp
+      # check if the code given is valid or not
+      if @input.split.length == 4
+        @code = @input
+        break
+      else
+        puts "\r"
+        puts 'Invalid code! Only 4 colors are allowed.'
+      end
+    end
+    @code
+  end
   # end game on turn exceeding maximum 12
   # ask user to be creator of code or guesser
   def ask
@@ -21,11 +38,11 @@ module MyMethods
       # display chosen choice
       puts "\r"
       if @input.downcase == 'mm'
-        puts "You've chosen :- "
+        puts "You've chosen mastermind "
         @flag = true
         @choice = 'mastermind'
       elsif @input.downcase == 'cb'
-        puts "You've chosen :-"
+        puts "You've chosen codebreaker"
         @flag = true
         @choice = 'codebreaker'
       else
@@ -39,25 +56,26 @@ module MyMethods
   end
 
   # get random color code for the computer
-  def code_generator
+  def code_generator(color_array)
+    @color_array = color_array
     @code = []
     # push 4 random colors into the code
     # from the colors array
     4.times do
       # push 1 random color into the code
       # remove it from the color array as well
-      @code << @@color_array.delete_at(rand(@@color_array.size - 1))
+      @code << @color_array.delete_at(rand(@color_array.size - 1))
     end
     @code
   end
 
   # get guess from Human/Computer
   def get_guess(player)
-    @flag = false
     @turns = 1
     puts 'Make sure the spellings are correct!'
+    puts "Available colors are 'red', 'green', 'yellow', 'blue', 'magenta' and 'black'."
     # run loop til all matches are '🟢' or turns are finished
-    while !@flag || @turns < 13
+    while @turns < 13
       # get guess from Player
       print "Enter your guess #{player} : "
       @guess = gets.chomp
@@ -73,8 +91,8 @@ module MyMethods
         print 'Feedback Message : '
         puts @answer.join
         if @answer.all? { |answer| answer == '🟢' }
-          # show user feedback
-          @flag = true
+          puts "Correct guess! You won!"
+          break
         else
           # show user feedback
           puts 'Wrong guess! Keep trying.'
