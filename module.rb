@@ -71,11 +71,11 @@ module MyMethods
 
   # get guess from Human/Computer
   def get_guess(player)
-    @turns = 1
+    @turns = 0
     puts 'Make sure the spellings are correct!'
     puts "Available colors are 'red', 'green', 'yellow', 'blue', 'magenta' and 'black'."
     # run loop til all matches are '🟢' or turns are finished
-    while @turns < 13
+    while true
       # get guess from Player
       print "Enter your guess #{player} : "
       @guess = gets.chomp
@@ -99,6 +99,23 @@ module MyMethods
         end
       end
       @turns += 1
+      # break if turns reach max 12
+      if @turns == 12
+        puts 'Your turns are over! You lost the game. Better luck next time.'
+        break
+      end
+    end
+  end
+
+  # when the player wins or loses the game
+  def game_over
+    puts "\r"
+    puts 'Game Over'
+    print 'Would you like to play the game again? Type y for yes or n for no : '
+    @choice = gets.chomp
+    puts "\r"
+    if @choice == 'y'
+      MasterMind.new
     end
   end
 end
