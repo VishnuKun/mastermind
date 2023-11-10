@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './module.rb'
-require_relative './players.rb'
+require_relative './module'
 class MasterMind
   include MyMethods
 
@@ -9,66 +8,63 @@ class MasterMind
   @@color_array = %w[red green yellow blue magenta black]
   # store code
   @@code = []
-  
+
   # mix in
   # return feedback message
   def feedback_message(guess)
+    @guess = guess
     @feedback = []
     # '🟢' => correct color at correct position
     # '⭕' => correct color at wrong position
     # '⚫' => color not used in code
-    @guess_array = guess
     # store matches
     @matched = []
     # iterate through the array and check for matches
     # if an element matches then check for indexes as well
-    if @guess_array 
-      @guess_array.each do |guess|
-        # push element that matches with any code element
-        @matched << if @@code.include?(guess) == true
-                      guess
-                    else
-                      # if not, then push '_' to the feedback
-                      '_'
-                    end
-      end
+    @guess.each do |color|
+      # push element that matches with any code element
+      @matched << if @@code.include?(color)
+                    color
+                  else
+                    # if not, then push '_' to the feedback
+                    '_'
+                  end
     end
     # now check if matches were
-    unless @matched.all? { |colors| colors == '_' }
-      4.times do |i|
-        @feedback << if @matched[i - 1] == @@code[i - 1]
-                       # if element matches with code's element
-                       '🟢'
-                     elsif @matched[i -1] == '_'
-                       # if element matches with '_'
-                       '⚫'
-                     else
-                       '⭕'
-                     end
-      end
+    4.times do |i|
+      @feedback << if @matched[i - 1] == @@code[i - 1]
+                     # if element matches with code's element
+                     '🟢'
+                   elsif @matched[i - 1] == '_'
+                     # if element matches with '_'
+                     '⚫'
+                   else
+                     '⭕'
+                   end
     end
     # return the feedback
     @feedback.shuffle
   end
-  # initialize 
+
+  # initialize
   def initialize
-    @player = self.ask
+    @player = ask
     # check if player is master mind or codebreaker
-    if @player == 'mastermind' 
-      self.set_code
-      # make the computer give suggestions
+    if @player == 'mastermind'
+      @@code = set_code
+      get_guess('Computer')
+      @guess = give_code
     else
       # generate the random code
-      @@code = self.code_generator(@@color_array)
-      @guess = self.get_guess(@player)
-      self.feedback_message(@guess)
-      if @guess == 'Correct guess! You won!'
-        puts 'working'
-      end
+      # set the code
+      @@code = code_generator(@@color_array)
+      # guess the code
+      @guess = get_guess('Human')
+      # display feedback
     end
+    feedback_message(@guess)
+    game_over
   end
-
 end
 
-game = MasterMind.new
-
+MasterMind.new

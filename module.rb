@@ -2,9 +2,9 @@
 
 module MyMethods
   # ask the mastermind to set the code for game
-  def set_code 
+  def set_code
     @code = nil
-    while true
+    loop do
       # get the code
       puts "\r"
       print 'Set the code for game, MasterMind : '
@@ -20,6 +20,7 @@ module MyMethods
     end
     @code
   end
+
   # end game on turn exceeding maximum 12
   # ask user to be creator of code or guesser
   def ask
@@ -69,18 +70,34 @@ module MyMethods
     @code
   end
 
+  # get codes for computer based on some strategy
+  def give_code
+    @code = code_generator(%w[red green yellow blue magenta black])
+    @code
+  end
+
   # get guess from Human/Computer
-  def get_guess(player)
+  def get_guess(user)
     @turns = 0
     puts 'Make sure the spellings are correct!'
     puts "Available colors are 'red', 'green', 'yellow', 'blue', 'magenta' and 'black'."
     # run loop til all matches are '🟢' or turns are finished
-    while true
+    loop do
       # get guess from Player
-      print "Enter your guess #{player} : "
-      @guess = gets.chomp
-      @guess = @guess.split
-      # input should only be 4 characters long
+      print "Enter your guess #{user} : "
+      # check user
+      if user == 'Computer'
+        @guess = give_code
+        print @guess.join(' ')
+        puts "\r"
+
+      elsif user == 'Player'
+        @guess = gets.chomp.split
+        print @guess.join(' ')
+      else
+        @guess = gets.chomp.split
+        print @guess.join(' ')
+      end
       if @guess.length != 4
         puts "\r"
         puts 'Please enter 4 colors only! Please try again.'
@@ -91,13 +108,14 @@ module MyMethods
         print 'Feedback Message : '
         puts @answer.join
         if @answer.all? { |answer| answer == '🟢' }
-          puts "Correct guess! You won!"
+          puts 'Correct guess! You won!'
           break
         else
           # show user feedback
           puts 'Wrong guess! Keep trying.'
         end
       end
+      # input should only be 4 characters long
       @turns += 1
       # break if turns reach max 12
       if @turns == 12
@@ -109,13 +127,21 @@ module MyMethods
 
   # when the player wins or loses the game
   def game_over
-    puts "\r"
-    puts 'Game Over'
-    print 'Would you like to play the game again? Type y for yes or n for no : '
-    @choice = gets.chomp
-    puts "\r"
-    if @choice == 'y'
-      MasterMind.new
+    loop do
+      puts "\r"
+      puts 'Game Over'
+      print 'Would you like to play the game again? Type y for yes or n for no : '
+      @choice = gets.chomp
+      puts "\r"
+      if @choice == 'y'
+        MasterMind.new
+      elsif @choice == 'n'
+        puts "\r"
+        puts 'Thanks for playing the game!'
+        break
+      else
+        puts "Please answer in 'y' or 'n' only."
+      end
     end
   end
 end
